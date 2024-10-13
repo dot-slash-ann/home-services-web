@@ -62,27 +62,53 @@ const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps>
       </div>
 
       <div>
-        <label for="filterPostedOn" class="block text-sm font-medium text-gray-700">
-          Posted On
+        <label for="filterPostedOnFrom" class="block text-sm font-medium text-gray-700">
+          Posted From
         </label>
         <input
           type="date"
-          id="filterPostedOn"
+          id="filterPostedOnFrom"
           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          // value={filterPostedOn}
+          // value={filterPostedOnFrom}
           // onChange={handleFilterPostedOnChange}
         />
       </div>
 
       <div>
-        <label for="filterTransactionOn" class="block text-sm font-medium text-gray-700">
-          Transaction On
+        <label for="filterPostedOnTo" class="block text-sm font-medium text-gray-700">
+          Posted To
         </label>
         <input
           type="date"
-          id="filterTransactionOn"
+          id="filterPostedOnTo"
           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          // value={filterTransactionOn}
+          // value={filterPostedOnTo}
+          // onChange={handleFilterPostedOnChange}
+        />
+      </div>
+
+      <div>
+        <label for="filterTransactionOnFrom" class="block text-sm font-medium text-gray-700">
+          Transaction From
+        </label>
+        <input
+          type="date"
+          id="filterTransactionOnFrom"
+          class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          // value={filterTransactionOnFrom}
+          // onChange={handleFilterTransactionOnChange}
+        />
+      </div>
+
+      <div>
+        <label for="filterTransactionOnTo" class="block text-sm font-medium text-gray-700">
+          Transaction To
+        </label>
+        <input
+          type="date"
+          id="filterTransactionOnTo"
+          class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          // value={filterTransactionOnTo}
           // onChange={handleFilterTransactionOnChange}
         />
       </div>
