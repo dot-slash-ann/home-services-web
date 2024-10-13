@@ -11,7 +11,7 @@ import TransactionForm, { NewTransactionErrorSignal } from '../components/forms/
 import { CategoriesListResponse, Category } from '../types/categories';
 import { Vendor, VendorsListResponse } from '../types/vendors';
 import TransactionsFiltersForm from '../components/forms/transactions-filters-form';
-import { Filter, FiltersType } from 'src/types/forms';
+import { FiltersType } from 'src/types/forms';
 
 dayjs.extend(utc);
 
