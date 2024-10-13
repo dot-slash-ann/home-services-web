@@ -8,14 +8,18 @@ type TransactionsFiltersFormProps = {
   categories: Signal<Category[]>;
 
   filterCategory: Signal<string>;
+  filterVendor: Signal<string>;
   handleFilterCategoryChange: (category: string) => void;
+  handleFilterVendorChange: (vendor: string) => void;
 };
 
 const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps> = ({
   categories,
   vendors,
   filterCategory,
+  filterVendor,
   handleFilterCategoryChange,
+  handleFilterVendorChange,
 }: TransactionsFiltersFormProps): h.JSX.Element => {
   return (
     <div class="bg-white shadow-md rounded p-4 flex space-x-4 items-end">
@@ -45,12 +49,12 @@ const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps>
         <select
           id="filterVendor"
           class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          // value={filterVendor}
-          // onChange={handleFilterVendorChange}
+          value={filterVendor}
+          onChange={(event: Event) => handleFilterVendorChange((event.target as HTMLInputElement).value)}
         >
           <option value="">All</option>
           {vendors.value.map((vendor) => (
-            <option key={vendor.id} value={vendor.id}>
+            <option key={vendor.id} value={JSON.stringify({ id: vendor.id, name: vendor.name })}>
               {vendor.name}
             </option>
           ))}

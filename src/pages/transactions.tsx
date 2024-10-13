@@ -11,6 +11,7 @@ import TransactionForm, { NewTransactionErrorSignal } from '../components/forms/
 import { CategoriesListResponse, Category } from '../types/categories';
 import { Vendor, VendorsListResponse } from '../types/vendors';
 import TransactionsFiltersForm from '../components/forms/transactions-filters-form';
+import { Filter, FiltersType } from 'src/types/forms';
 
 dayjs.extend(utc);
 
@@ -23,6 +24,9 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
   const vendorInput = useSignal<string>('');
 
   const filterCategory = useSignal<string>('');
+  const filterVendor = useSignal<string>('');
+
+  const filters = useSignal<Map<`${FiltersType}_id`, number | string>>(new Map());
 
   const transactions = useSignal<Transaction[]>([]);
   const categories = useSignal<Category[]>([]);
@@ -123,31 +127,61 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
 
   async function handleFilterCategoryChange(categoryJson: string) {
     try {
-      let url;
+      const category = categoryJson !== '' ? (JSON.parse(categoryJson) as Category | '') : '';
 
-      if (categoryJson === '') {
-        url = 'http://localhost:3000/api/transactions';
+      if (category === '') {
+        filters.value.delete('category_id');
       } else {
-        const category = JSON.parse(categoryJson) as Category;
-
-        url = `http://localhost:3000/api/transactions?category_id=${category.id}`;
+        filters.value.set('category_id', category.id);
       }
+
+      filterCategory.value = categoryJson;
+      handleFilterChange();
+    } catch (error: unknown) {
+      console.log('Error filtering by category', error);
+    }
+  }
+
+  async function handleFilterVendorChange(vendorJson: string) {
+    try {
+      const vendor = vendorJson !== '' ? (JSON.parse(vendorJson) as Category | '') : '';
+
+      if (vendor === '') {
+        filters.value.delete('vendor_id');
+      } else {
+        filters.value.set('vendor_id', vendor.id);
+      }
+
+      filterVendor.value = vendorJson;
+      handleFilterChange();
+    } catch (error: unknown) {
+      console.log('Error filtering by vendor', error);
+    }
+  }
+
+  async function handleFilterChange() {
+    try {
+      let url = 'http://localhost:3000/api/transactions';
+
+      if (filters.value.size > 0) {
+        url += '?';
+
+        for (const [key, value] of filters.value.entries()) {
+          url += `${key}=${value}&`;
+        }
+
+        url.substring(0, url.length - 1);
+      }
+
+      console.log(url);
 
       const response = await fetch(url);
 
-      if (!response.ok) {
-        console.log('Something went wrong', response);
+      const transactionsList = (await response.json()) as TransactionsListResponse;
 
-        return;
-      }
-
-      const transactionsResponse = (await response.json()) as TransactionsListResponse;
-
-      filterCategory.value = categoryJson;
-
-      transactions.value = transactionsResponse.data;
+      transactions.value = transactionsList.data;
     } catch (error: unknown) {
-      console.error('Error filtering by category', error);
+      console.log('Error filtering', error);
     }
   }
 
@@ -171,7 +205,9 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
           categories={categories}
           vendors={vendors}
           filterCategory={filterCategory}
+          filterVendor={filterVendor}
           handleFilterCategoryChange={handleFilterCategoryChange}
+          handleFilterVendorChange={handleFilterVendorChange}
         />
       </div>
 
