@@ -9,7 +9,8 @@ import { TargetedEvent } from 'preact/compat';
 import { TransactionsListResponse, Transaction, TransactionResponse } from '../types/transactions';
 import TransactionForm, { NewTransactionErrorSignal } from '../components/forms/transactions-form';
 import { CategoriesListResponse, Category } from '../types/categories';
-import { Vendor, VendorsListResponse } from '..//types/vendors';
+import { Vendor, VendorsListResponse } from '../types/vendors';
+import TransactionsFiltersForm from '../components/forms/transactions-filters-form';
 
 dayjs.extend(utc);
 
@@ -20,6 +21,8 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
 
   const categoryInput = useSignal<string>('');
   const vendorInput = useSignal<string>('');
+
+  const filterCategory = useSignal<string>('');
 
   const transactions = useSignal<Transaction[]>([]);
   const categories = useSignal<Category[]>([]);
@@ -118,6 +121,36 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
     }
   }
 
+  async function handleFilterCategoryChange(categoryJson: string) {
+    try {
+      let url;
+
+      if (categoryJson === '') {
+        url = 'http://localhost:3000/api/transactions';
+      } else {
+        const category = JSON.parse(categoryJson) as Category;
+
+        url = `http://localhost:3000/api/transactions?category_id=${category.id}`;
+      }
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        console.log('Something went wrong', response);
+
+        return;
+      }
+
+      const transactionsResponse = (await response.json()) as TransactionsListResponse;
+
+      filterCategory.value = categoryJson;
+
+      transactions.value = transactionsResponse.data;
+    } catch (error: unknown) {
+      console.error('Error filtering by category', error);
+    }
+  }
+
   return (
     <div class="max-w-7xl mx-auto mt-10">
       <div class="max-w-md mx-auto">
@@ -133,7 +166,16 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
         />
       </div>
 
-      <div class="overflow-x-auto mx-auto my-8">
+      <div class="max-w-7xl mx-auto mt-6">
+        <TransactionsFiltersForm
+          categories={categories}
+          vendors={vendors}
+          filterCategory={filterCategory}
+          handleFilterCategoryChange={handleFilterCategoryChange}
+        />
+      </div>
+
+      <div class="overflow-x-auto mx-auto my-8 shadow-md">
         <table class="min-w-full bg-white shadow-md rounded border-collapse">
           <thead>
             <tr>
