@@ -9,8 +9,17 @@ type TransactionsFiltersFormProps = {
 
   filterCategory: Signal<string>;
   filterVendor: Signal<string>;
+  filterTransactionOnFrom: Signal<string>;
+  filterTransactionOnTo: Signal<string>;
+  filterPostedOnFrom: Signal<string>;
+  filterPostedOnTo: Signal<string>;
+
   handleFilterCategoryChange: (category: string) => void;
   handleFilterVendorChange: (vendor: string) => void;
+  handleFilterTransactionOnFromChange: (transactionOnFrom: string) => void;
+  handleFilterTransactionOnToChange: (transactionOnTo: string) => void;
+  handleFilterPostedOnFromChange: (postedOnFrom: string) => void;
+  handleFilterPostedOnToChange: (postedOnTo: string) => void;
 };
 
 const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps> = ({
@@ -18,8 +27,16 @@ const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps>
   vendors,
   filterCategory,
   filterVendor,
+  filterTransactionOnFrom,
+  filterTransactionOnTo,
+  filterPostedOnFrom,
+  filterPostedOnTo,
   handleFilterCategoryChange,
   handleFilterVendorChange,
+  handleFilterTransactionOnFromChange,
+  handleFilterTransactionOnToChange,
+  handleFilterPostedOnFromChange,
+  handleFilterPostedOnToChange,
 }: TransactionsFiltersFormProps): h.JSX.Element => {
   return (
     <div class="bg-white shadow-md rounded p-4 flex space-x-4 items-end">
@@ -69,8 +86,8 @@ const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps>
           type="date"
           id="filterPostedOnFrom"
           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          // value={filterPostedOnFrom}
-          // onChange={handleFilterPostedOnChange}
+          value={filterPostedOnFrom}
+          onChange={(event: Event) => handleFilterPostedOnFromChange((event.target as HTMLInputElement).value)}
         />
       </div>
 
@@ -82,8 +99,8 @@ const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps>
           type="date"
           id="filterPostedOnTo"
           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          // value={filterPostedOnTo}
-          // onChange={handleFilterPostedOnChange}
+          value={filterPostedOnTo}
+          onChange={(event: Event) => handleFilterPostedOnToChange((event.target as HTMLInputElement).value)}
         />
       </div>
 
@@ -95,8 +112,8 @@ const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps>
           type="date"
           id="filterTransactionOnFrom"
           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          // value={filterTransactionOnFrom}
-          // onChange={handleFilterTransactionOnChange}
+          value={filterTransactionOnFrom}
+          onChange={(event: Event) => handleFilterTransactionOnFromChange((event.target as HTMLInputElement).value)}
         />
       </div>
 
@@ -108,8 +125,8 @@ const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps>
           type="date"
           id="filterTransactionOnTo"
           class="mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-          // value={filterTransactionOnTo}
-          // onChange={handleFilterTransactionOnChange}
+          value={filterTransactionOnTo}
+          onChange={(event: Event) => handleFilterTransactionOnToChange((event.target as HTMLInputElement).value)}
         />
       </div>
 

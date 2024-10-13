@@ -11,7 +11,7 @@ import TransactionForm, { NewTransactionErrorSignal } from '../components/forms/
 import { CategoriesListResponse, Category } from '../types/categories';
 import { Vendor, VendorsListResponse } from '../types/vendors';
 import TransactionsFiltersForm from '../components/forms/transactions-filters-form';
-import { FiltersType } from 'src/types/forms';
+import { DateFilterType, FiltersType } from 'src/types/forms';
 
 dayjs.extend(utc);
 
@@ -25,8 +25,12 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
 
   const filterCategory = useSignal<string>('');
   const filterVendor = useSignal<string>('');
+  const filterTransactionOnFrom = useSignal<string>('');
+  const filterTransactionOnTo = useSignal<string>('');
+  const filterPostedOnFrom = useSignal<string>('');
+  const filterPostedOnTo = useSignal<string>('');
 
-  const filters = useSignal<Map<`${FiltersType}_id`, number | string>>(new Map());
+  const filters = useSignal<Map<`${FiltersType}_id` | DateFilterType, number | string>>(new Map());
 
   const transactions = useSignal<Transaction[]>([]);
   const categories = useSignal<Category[]>([]);
@@ -159,6 +163,54 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
     }
   }
 
+  async function handleFilterTransactionOnFromChange(transactionOnFrom: string) {
+    if (transactionOnFrom === '') {
+      filters.value.delete('transaction_on_from');
+    } else {
+      filters.value.set('transaction_on_from', transactionOnFrom);
+    }
+
+    filterTransactionOnFrom.value = transactionOnFrom;
+
+    handleFilterChange();
+  }
+
+  async function handleFilterTransactionOnToChange(transactionOnTo: string) {
+    if (transactionOnTo === '') {
+      filters.value.delete('transaction_on_to');
+    } else {
+      filters.value.set('transaction_on_to', transactionOnTo);
+    }
+
+    filterTransactionOnTo.value = transactionOnTo;
+
+    handleFilterChange();
+  }
+
+  async function handleFilterPostedOnFromChange(postedOnFrom: string) {
+    if (postedOnFrom === '') {
+      filters.value.delete('posted_on_from');
+    } else {
+      filters.value.set('posted_on_from', postedOnFrom);
+    }
+
+    filterPostedOnFrom.value = postedOnFrom;
+
+    handleFilterChange();
+  }
+
+  async function handleFilterPostedOnToChange(postedOnTo: string) {
+    if (postedOnTo === '') {
+      filters.value.delete('posted_on_to');
+    } else {
+      filters.value.set('posted_on_to', postedOnTo);
+    }
+
+    filterPostedOnTo.value = postedOnTo;
+
+    handleFilterChange();
+  }
+
   async function handleFilterChange() {
     try {
       let url = 'http://localhost:3000/api/transactions';
@@ -206,8 +258,16 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
           vendors={vendors}
           filterCategory={filterCategory}
           filterVendor={filterVendor}
+          filterTransactionOnFrom={filterTransactionOnFrom}
+          filterTransactionOnTo={filterTransactionOnTo}
+          filterPostedOnFrom={filterPostedOnFrom}
+          filterPostedOnTo={filterPostedOnTo}
           handleFilterCategoryChange={handleFilterCategoryChange}
           handleFilterVendorChange={handleFilterVendorChange}
+          handleFilterTransactionOnFromChange={handleFilterTransactionOnFromChange}
+          handleFilterTransactionOnToChange={handleFilterTransactionOnToChange}
+          handleFilterPostedOnFromChange={handleFilterPostedOnFromChange}
+          handleFilterPostedOnToChange={handleFilterPostedOnToChange}
         />
       </div>
 
@@ -240,8 +300,8 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
                     Tag
                   </button>
                 </td>
-                <td class="py-2 px-4 border">{dayjs(transaction.posted_on).format('MM/DD/YYYY')}</td>
-                <td class="py-2 px-4 border">{dayjs(transaction.transaction_on).format('MM/DD/YYYY')}</td>
+                <td class="py-2 px-4 border">{dayjs.utc(transaction.posted_on).format('MM/DD/YYYY')}</td>
+                <td class="py-2 px-4 border">{dayjs.utc(transaction.transaction_on).format('MM/DD/YYYY')}</td>
                 <td class="py-2 px-4 border">
                   {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(transaction.amount)}
                 </td>
