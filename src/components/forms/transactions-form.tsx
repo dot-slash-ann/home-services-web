@@ -9,6 +9,7 @@ type TransactionFormProps = {
   postedOnInput: Signal<Date | null>;
   transactionOnInput: Signal<Date | null>;
   amountInput: Signal<number | null>;
+  transactionTypeInput: Signal<string>;
 
   categoryInput: Signal<string>;
   vendorInput: Signal<string>;
@@ -24,6 +25,7 @@ const TransactionForm: FunctionComponent<TransactionFormProps> = ({
   postedOnInput,
   transactionOnInput,
   amountInput,
+  transactionTypeInput,
   categoryInput,
   vendorInput,
   categories,
@@ -31,23 +33,6 @@ const TransactionForm: FunctionComponent<TransactionFormProps> = ({
 }: TransactionFormProps): h.JSX.Element => {
   return (
     <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSubmit}>
-      <div class="mb-4">
-        <label for="posted-on" class="block text-gray-700 text-sm font-bold mb-2">
-          Posted On
-        </label>
-        <input
-          id="posted-on"
-          type="date"
-          class={`${
-            NewTransactionErrorSignal.value ? 'border-red-500 bg-red-100 ' : 'border-gray-300 '
-          }shadow appearance-none border rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
-          value={postedOnInput.value?.toISOString().split('T')[0] || ''}
-          onInput={(event) => {
-            postedOnInput.value = new Date((event.target as HTMLInputElement).value);
-            NewTransactionErrorSignal.value = false;
-          }}
-        />
-      </div>
       <div class="mb-4">
         <label for="transaction-on" class="block text-gray-700 text-sm font-bold mb-2">
           Transaction On
@@ -66,12 +51,30 @@ const TransactionForm: FunctionComponent<TransactionFormProps> = ({
         />
       </div>
       <div class="mb-4">
+        <label for="posted-on" class="block text-gray-700 text-sm font-bold mb-2">
+          Posted On
+        </label>
+        <input
+          id="posted-on"
+          type="date"
+          class={`${
+            NewTransactionErrorSignal.value ? 'border-red-500 bg-red-100 ' : 'border-gray-300 '
+          }shadow appearance-none border rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
+          value={postedOnInput.value?.toISOString().split('T')[0] || ''}
+          onInput={(event) => {
+            postedOnInput.value = new Date((event.target as HTMLInputElement).value);
+            NewTransactionErrorSignal.value = false;
+          }}
+        />
+      </div>
+      <div class="mb-4">
         <label for="amount" class="block text-gray-700 text-sm font-bold mb-2">
           Amount
         </label>
         <input
           id="amount"
           type="number"
+          step="any"
           class={`${
             NewTransactionErrorSignal.value ? 'border-red-500 bg-red-100 ' : 'border-gray-300 '
           }shadow appearance-none border rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`}
@@ -81,6 +84,23 @@ const TransactionForm: FunctionComponent<TransactionFormProps> = ({
             NewTransactionErrorSignal.value = false;
           }}
         />
+      </div>
+      <div class="mb-4">
+        <label for="transaction-type" class="block text-gray-700 text-sm font-bold mb-2">
+          Transaction Type
+        </label>
+        <select
+          id="transaction-type"
+          class="shadow appearance-none border rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          onInput={(event) => {
+            transactionTypeInput.value = (event.target as HTMLInputElement).value;
+            NewTransactionErrorSignal.value = false;
+          }}
+        >
+          <option value="">Select a transaction type</option>
+          <option value="credit">Credit</option>
+          <option value="debit">Debit</option>
+        </select>
       </div>
       <div class="mb-4">
         <label for="category" class="block text-gray-700 text-sm font-bold mb-2">

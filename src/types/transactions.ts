@@ -7,6 +7,7 @@ export interface Transaction {
   posted_on: string;
   transaction_on: string;
   amount: number;
+  transaction_type: string;
   category: Category;
   tags: Tag[];
   vendor: Vendor;

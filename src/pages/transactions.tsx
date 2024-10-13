@@ -11,7 +11,8 @@ import TransactionForm, { NewTransactionErrorSignal } from '../components/forms/
 import { CategoriesListResponse, Category } from '../types/categories';
 import { Vendor, VendorsListResponse } from '../types/vendors';
 import TransactionsFiltersForm from '../components/forms/transactions-filters-form';
-import { DateFilterType, FiltersType } from 'src/types/forms';
+import { DateFilterType, FiltersType } from '../types/forms';
+import { capitalize } from '../lib/lib';
 
 dayjs.extend(utc);
 
@@ -19,6 +20,7 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
   const postedOnInput = useSignal<Date | null>(null);
   const transactionOnInput = useSignal<Date | null>(null);
   const amountInput = useSignal<number | null>(null);
+  const transactionTypeInput = useSignal<string>('');
 
   const categoryInput = useSignal<string>('');
   const vendorInput = useSignal<string>('');
@@ -79,7 +81,8 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
         body: JSON.stringify({
           posted_on: dayjs.utc(postedOnInput.value).format('YYYY-MM-DD'),
           transaction_on: dayjs.utc(transactionOnInput.value).format('YYYY-MM-DD'),
-          amount: amountInput.value,
+          amount: amountInput.value * 100,
+          transaction_type: transactionTypeInput.value,
           category: categoryInput.value,
           vendor: vendorInput.value,
         }),
@@ -257,6 +260,7 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
           postedOnInput={postedOnInput}
           transactionOnInput={transactionOnInput}
           amountInput={amountInput}
+          transactionTypeInput={transactionTypeInput}
           categoryInput={categoryInput}
           vendorInput={vendorInput}
           categories={categories}
@@ -290,9 +294,10 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
           <thead>
             <tr>
               <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Actions</th>
-              <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Posted On</th>
               <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Transaction On</th>
+              <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Posted On</th>
               <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Amount</th>
+              <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Type</th>
               <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Category</th>
               <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Vendor</th>
             </tr>
@@ -314,11 +319,18 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
                     Tag
                   </button>
                 </td>
-                <td class="py-2 px-4 border">{dayjs.utc(transaction.posted_on).format('MM/DD/YYYY')}</td>
                 <td class="py-2 px-4 border">{dayjs.utc(transaction.transaction_on).format('MM/DD/YYYY')}</td>
-                <td class="py-2 px-4 border">
-                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(transaction.amount)}
+                <td class="py-2 px-4 border">{dayjs.utc(transaction.posted_on).format('MM/DD/YYYY')}</td>
+                <td class={`py-2 px-4 border ${transaction.transaction_type === 'debit' ? 'text-red-500' : ''}`}>
+                  {transaction.transaction_type === 'debit'
+                    ? `(${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+                        transaction.amount / 100,
+                      )})`
+                    : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
+                        transaction.amount / 100,
+                      )}
                 </td>
+                <td class="py-2 px-4 border">{capitalize(transaction.transaction_type)}</td>
                 <td class="py-2 px-4 border">{transaction.category.name}</td>
                 <td class="py-2 px-4 border">{transaction.vendor.name}</td>
               </tr>
