@@ -1,12 +1,20 @@
 import { signal, Signal } from '@preact/signals';
 import { FunctionComponent, h } from 'preact';
 import { TargetedEvent } from 'preact/compat';
+import { Category } from '../../types/categories';
+import { Vendor } from '../../types/vendors';
 
 type TransactionFormProps = {
   handleSubmit: (event: TargetedEvent<HTMLFormElement, Event>) => void;
   postedOnInput: Signal<Date | null>;
   transactionOnInput: Signal<Date | null>;
   amountInput: Signal<number | null>;
+
+  categoryInput: Signal<string>;
+  vendorInput: Signal<string>;
+
+  categories: Signal<Category[]>;
+  vendors: Signal<Vendor[]>;
 };
 
 export const NewTransactionErrorSignal = signal<boolean>(false);
@@ -16,6 +24,10 @@ const TransactionForm: FunctionComponent<TransactionFormProps> = ({
   postedOnInput,
   transactionOnInput,
   amountInput,
+  categoryInput,
+  vendorInput,
+  categories,
+  vendors,
 }: TransactionFormProps): h.JSX.Element => {
   return (
     <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4" onSubmit={handleSubmit}>
@@ -69,6 +81,48 @@ const TransactionForm: FunctionComponent<TransactionFormProps> = ({
             NewTransactionErrorSignal.value = false;
           }}
         />
+      </div>
+      <div class="mb-4">
+        <label for="category" class="block text-gray-700 text-sm font-bold mb-2">
+          Category
+        </label>
+        <select
+          id="category"
+          class="shadow appearance-none border rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          value={categoryInput.value}
+          onInput={(event) => {
+            categoryInput.value = (event.target as HTMLSelectElement).value;
+            NewTransactionErrorSignal.value = false;
+          }}
+        >
+          <option value="">Select a category</option>
+          {categories.value.map((category) => (
+            <option key={category.id} value={category.name}>
+              {category.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div class="mb-4">
+        <label for="vendor" class="block text-gray-700 text-sm font-bold mb-2">
+          Vendor
+        </label>
+        <select
+          id="vendor"
+          class="shadow appearance-none border rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          value={vendorInput.value}
+          onInput={(event) => {
+            vendorInput.value = (event.target as HTMLSelectElement).value;
+            NewTransactionErrorSignal.value = false;
+          }}
+        >
+          <option value="">Select a vendor</option>
+          {vendors.value.map((vendor) => (
+            <option key={vendor.id} value={vendor.name}>
+              {vendor.name}
+            </option>
+          ))}
+        </select>
       </div>
       <div class="flex items-center justify-between">
         <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">

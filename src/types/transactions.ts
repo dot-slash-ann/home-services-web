@@ -4,8 +4,8 @@ import { Vendor } from './vendors';
 
 export interface Transaction {
   id: number;
-  postedOn: Date;
-  transactionOn: Date;
+  posted_on: string;
+  transaction_on: string;
   amount: number;
   category: Category;
   tags: Tag[];
