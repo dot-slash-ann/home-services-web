@@ -146,29 +146,31 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
             </tr>
           </thead>
           <tbody>
-            {transactions.value.map((transaction) => {
-              console.log(transaction);
-
-              return (
-                <tr key={transaction.id}>
-                  <td class="py-2 px-4 border">
-                    <button
-                      class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                      onClick={() => handleDelete(transaction.id)}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                  <td class="py-2 px-4 border">{dayjs(transaction.posted_on).format('MM/DD/YYYY')}</td>
-                  <td class="py-2 px-4 border">{dayjs(transaction.transaction_on).format('MM/DD/YYYY')}</td>
-                  <td class="py-2 px-4 border">
-                    {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(transaction.amount)}
-                  </td>
-                  <td class="py-2 px-4 border">{transaction.category.name}</td>
-                  <td class="py-2 px-4 border">{transaction.vendor.name}</td>
-                </tr>
-              );
-            })}
+            {transactions.value.map((transaction) => (
+              <tr key={transaction.id}>
+                <td class="py-2 px-4 border">
+                  <button
+                    class="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                    onClick={() => handleDelete(transaction.id)}
+                  >
+                    Delete
+                  </button>
+                  <button
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
+                    onClick={() => {}}
+                  >
+                    Tag
+                  </button>
+                </td>
+                <td class="py-2 px-4 border">{dayjs(transaction.posted_on).format('MM/DD/YYYY')}</td>
+                <td class="py-2 px-4 border">{dayjs(transaction.transaction_on).format('MM/DD/YYYY')}</td>
+                <td class="py-2 px-4 border">
+                  {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(transaction.amount)}
+                </td>
+                <td class="py-2 px-4 border">{transaction.category.name}</td>
+                <td class="py-2 px-4 border">{transaction.vendor.name}</td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
