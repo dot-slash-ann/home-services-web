@@ -20,6 +20,7 @@ type TransactionsFiltersFormProps = {
   handleFilterTransactionOnToChange: (transactionOnTo: string) => void;
   handleFilterPostedOnFromChange: (postedOnFrom: string) => void;
   handleFilterPostedOnToChange: (postedOnTo: string) => void;
+  handleClearFilters: () => void;
 };
 
 const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps> = ({
@@ -37,6 +38,7 @@ const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps>
   handleFilterTransactionOnToChange,
   handleFilterPostedOnFromChange,
   handleFilterPostedOnToChange,
+  handleClearFilters,
 }: TransactionsFiltersFormProps): h.JSX.Element => {
   return (
     <div class="bg-white shadow-md rounded p-4 flex space-x-4 items-end">
@@ -132,7 +134,7 @@ const TransactionsFiltersForm: FunctionalComponent<TransactionsFiltersFormProps>
 
       <button
         class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-        // onClick={handleClearFilters}
+        onClick={handleClearFilters}
       >
         Clear Filters
       </button>

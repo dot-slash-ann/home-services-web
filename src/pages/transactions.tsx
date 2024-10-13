@@ -237,6 +237,19 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
     }
   }
 
+  function handleClearFilters() {
+    filters.value.clear();
+
+    filterCategory.value = '';
+    filterVendor.value = '';
+    filterTransactionOnFrom.value = '';
+    filterTransactionOnTo.value = '';
+    filterPostedOnFrom.value = '';
+    filterPostedOnTo.value = '';
+
+    handleFilterChange();
+  }
+
   return (
     <div class="max-w-7xl mx-auto mt-10">
       <div class="max-w-md mx-auto">
@@ -268,6 +281,7 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
           handleFilterTransactionOnToChange={handleFilterTransactionOnToChange}
           handleFilterPostedOnFromChange={handleFilterPostedOnFromChange}
           handleFilterPostedOnToChange={handleFilterPostedOnToChange}
+          handleClearFilters={handleClearFilters}
         />
       </div>
 
