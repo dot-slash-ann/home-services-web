@@ -9,6 +9,7 @@ import UsersPage from './pages/users';
 import VendorsPage from './pages/vendors';
 import Navbar from './components/Navbar';
 import NotFound from './pages/errors/not-found';
+import BudgetsPage from './pages/budgets';
 
 const App = (): h.JSX.Element => {
   return (
@@ -16,6 +17,7 @@ const App = (): h.JSX.Element => {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/budgets" element={<BudgetsPage />} />
         <Route path="/categories" element={<CategoriesPage />} />
         <Route path="/tags" element={<TagsPage />} />
         <Route path="/transactions" element={<TransactionsPage />} />

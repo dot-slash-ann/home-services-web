@@ -1,24 +1,23 @@
 import { useSignal } from '@preact/signals';
-import { FunctionalComponent, h } from 'preact';
+import { FunctionComponent, h } from 'preact';
 import { useEffect } from 'preact/hooks';
+import { Budget, BudgetResponse, BudgetsListResponse } from '../types/budgets';
+import BudgetsForm from '../components/forms/budgets-form';
 import { TargetedEvent } from 'preact/compat';
 
-import { CategoriesListResponse, Category, CategoryResponse } from '../types/categories';
-import CategoriesForm, { NewCategoryNameErrorSignal } from '../components/forms/categories-form';
-
-const CategoriesPage: FunctionalComponent = (): h.JSX.Element => {
+const BudgetsPage: FunctionComponent = (): h.JSX.Element => {
   const nameInput = useSignal<string>('');
-  const categories = useSignal<Category[]>([]);
+  const budgets = useSignal<Budget[]>([]);
 
   useEffect(() => {
-    async function fetchCategories() {
-      const response = await fetch('http://localhost:3000/api/categories');
-      const categoriesResponse = (await response.json()) as CategoriesListResponse;
+    async function fetchBudgets() {
+      const response = await fetch('http://localhost:3000/api/budgets');
+      const budgetsResponse = (await response.json()) as BudgetsListResponse;
 
-      categories.value = categoriesResponse.data;
+      budgets.value = budgetsResponse.data;
     }
 
-    fetchCategories();
+    fetchBudgets();
   }, []);
 
   async function handleSubmit(event: TargetedEvent<HTMLFormElement, Event>): Promise<void> {
@@ -37,21 +36,20 @@ const CategoriesPage: FunctionalComponent = (): h.JSX.Element => {
         body: JSON.stringify({ name: nameInput.value }),
       };
 
-      const response = await fetch('http://localhost:3000/api/categories', payload);
+      const response = await fetch('http://localhost:3000/api/budgets', payload);
 
       if (!response.ok) {
-        NewCategoryNameErrorSignal.value = true;
-
+        // TODO: add error state
         return;
       }
 
-      const result = (await response.json()) as CategoryResponse;
+      const result = (await response.json()) as BudgetResponse;
 
-      categories.value = [...categories.value, result.data];
+      budgets.value = [...budgets.value, result.data];
 
       nameInput.value = '';
     } catch (error: unknown) {
-      console.error('Error submitting form', error);
+      console.error('Error creating new budget', error);
     }
   }
 
@@ -61,27 +59,24 @@ const CategoriesPage: FunctionalComponent = (): h.JSX.Element => {
         method: 'DELETE',
       };
 
-      const response = await fetch(`http://localhost:3000/api/categories/${id}`, options);
+      const response = await fetch(`http://localhost:3000/api/budgets/${id}`, options);
 
       if (!response.ok) {
-        console.error('Failed to submit', response);
-
+        // TODO: add error state
         return;
       }
 
-      NewCategoryNameErrorSignal.value = false;
-
-      categories.value = categories.value.filter((category) => category.id !== id);
+      budgets.value = budgets.value.filter((budget) => budget.id !== id);
 
       nameInput.value = '';
     } catch (error: unknown) {
-      console.error('Error submitting form', error);
+      console.error('Error deleting budget', error);
     }
   }
 
   return (
     <div class="max-w-md mx-auto mt-10">
-      <CategoriesForm nameInput={nameInput} handleSubmit={handleSubmit} />
+      <BudgetsForm nameInput={nameInput} handleSubmit={handleSubmit} />
 
       <table class="min-w-full bg-white shadow-md rounded border-collapse">
         <thead>
@@ -91,17 +86,17 @@ const CategoriesPage: FunctionalComponent = (): h.JSX.Element => {
           </tr>
         </thead>
         <tbody>
-          {categories.value.map((category) => (
-            <tr key={category.id}>
+          {budgets.value.map((budget) => (
+            <tr key={budget.id}>
               <td class="py-2 px-4 border">
                 <button
                   class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                  onClick={() => handleDelete(category.id)}
+                  onClick={() => handleDelete(budget.id)}
                 >
                   Delete
                 </button>
               </td>
-              <td class="py-2 px-4 border">{category.name}</td>
+              <td class="py-2 px-4 border">{budget.name}</td>
             </tr>
           ))}
         </tbody>
@@ -110,4 +105,4 @@ const CategoriesPage: FunctionalComponent = (): h.JSX.Element => {
   );
 };
 
-export default CategoriesPage;
+export default BudgetsPage;

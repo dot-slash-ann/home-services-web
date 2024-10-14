@@ -11,6 +11,11 @@ const Navbar: FunctionComponent = (): h.JSX.Element => {
           </Link>
         </li>
         <li>
+          <Link to={'/budgets'} class="text-white hover:text-gray-300">
+            Budgets
+          </Link>
+        </li>
+        <li>
           <Link to={'/categories'} class="text-white hover:text-gray-300">
             Categories
           </Link>
