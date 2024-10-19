@@ -1,9 +1,10 @@
 import { useSignal } from '@preact/signals';
 import { FunctionComponent, h } from 'preact';
 import { useEffect } from 'preact/hooks';
+import { TargetedEvent } from 'preact/compat';
+import { Link } from 'react-router-dom';
 import { Budget, BudgetResponse, BudgetsListResponse } from '../types/budgets';
 import BudgetsForm from '../components/forms/budgets-form';
-import { TargetedEvent } from 'preact/compat';
 
 const BudgetsPage: FunctionComponent = (): h.JSX.Element => {
   const nameInput = useSignal<string>('');
@@ -96,7 +97,9 @@ const BudgetsPage: FunctionComponent = (): h.JSX.Element => {
                   Delete
                 </button>
               </td>
-              <td class="py-2 px-4 border">{budget.name}</td>
+              <td class="py-2 px-4 border">
+                <Link to={`/budgets/${budget.id}`}>{budget.name}</Link>
+              </td>
             </tr>
           ))}
         </tbody>

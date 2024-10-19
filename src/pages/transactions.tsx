@@ -10,9 +10,7 @@ import { TransactionsListResponse, Transaction, TransactionResponse } from '../t
 import TransactionForm, { NewTransactionErrorSignal } from '../components/forms/transactions-form';
 import { CategoriesListResponse, Category } from '../types/categories';
 import { Vendor, VendorsListResponse } from '../types/vendors';
-import TransactionsFiltersForm from '../components/forms/transactions-filters-form';
-import { DateFilterType, FiltersType } from '../types/forms';
-import { capitalize } from '../lib/lib';
+import TransactionsSection from '../components/TransactionsSection';
 
 dayjs.extend(utc);
 
@@ -24,15 +22,6 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
 
   const categoryInput = useSignal<string>('');
   const vendorInput = useSignal<string>('');
-
-  const filterCategory = useSignal<string>('');
-  const filterVendor = useSignal<string>('');
-  const filterTransactionOnFrom = useSignal<string>('');
-  const filterTransactionOnTo = useSignal<string>('');
-  const filterPostedOnFrom = useSignal<string>('');
-  const filterPostedOnTo = useSignal<string>('');
-
-  const filters = useSignal<Map<`${FiltersType}_id` | DateFilterType, number | string>>(new Map());
 
   const transactions = useSignal<Transaction[]>([]);
   const categories = useSignal<Category[]>([]);
@@ -110,149 +99,6 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
     }
   }
 
-  async function handleDelete(id: number): Promise<void> {
-    try {
-      const options = {
-        method: 'DELETE',
-      };
-
-      const response = await fetch(`http://localhost:3000/api/transactions/${id}`, options);
-
-      if (!response.ok) {
-        console.error('Failed to delete transaction', response);
-
-        return;
-      }
-
-      NewTransactionErrorSignal.value = false;
-
-      transactions.value = transactions.value.filter((transaction) => transaction.id !== id);
-    } catch (error: unknown) {
-      console.error('Error deleting transaction', error);
-    }
-  }
-
-  async function handleFilterCategoryChange(categoryJson: string) {
-    try {
-      const category = categoryJson !== '' ? (JSON.parse(categoryJson) as Category | '') : '';
-
-      if (category === '') {
-        filters.value.delete('category_id');
-      } else {
-        filters.value.set('category_id', category.id);
-      }
-
-      filterCategory.value = categoryJson;
-      handleFilterChange();
-    } catch (error: unknown) {
-      console.log('Error filtering by category', error);
-    }
-  }
-
-  async function handleFilterVendorChange(vendorJson: string) {
-    try {
-      const vendor = vendorJson !== '' ? (JSON.parse(vendorJson) as Category | '') : '';
-
-      if (vendor === '') {
-        filters.value.delete('vendor_id');
-      } else {
-        filters.value.set('vendor_id', vendor.id);
-      }
-
-      filterVendor.value = vendorJson;
-      handleFilterChange();
-    } catch (error: unknown) {
-      console.log('Error filtering by vendor', error);
-    }
-  }
-
-  async function handleFilterTransactionOnFromChange(transactionOnFrom: string) {
-    if (transactionOnFrom === '') {
-      filters.value.delete('transaction_on_from');
-    } else {
-      filters.value.set('transaction_on_from', transactionOnFrom);
-    }
-
-    filterTransactionOnFrom.value = transactionOnFrom;
-
-    handleFilterChange();
-  }
-
-  async function handleFilterTransactionOnToChange(transactionOnTo: string) {
-    if (transactionOnTo === '') {
-      filters.value.delete('transaction_on_to');
-    } else {
-      filters.value.set('transaction_on_to', transactionOnTo);
-    }
-
-    filterTransactionOnTo.value = transactionOnTo;
-
-    handleFilterChange();
-  }
-
-  async function handleFilterPostedOnFromChange(postedOnFrom: string) {
-    if (postedOnFrom === '') {
-      filters.value.delete('posted_on_from');
-    } else {
-      filters.value.set('posted_on_from', postedOnFrom);
-    }
-
-    filterPostedOnFrom.value = postedOnFrom;
-
-    handleFilterChange();
-  }
-
-  async function handleFilterPostedOnToChange(postedOnTo: string) {
-    if (postedOnTo === '') {
-      filters.value.delete('posted_on_to');
-    } else {
-      filters.value.set('posted_on_to', postedOnTo);
-    }
-
-    filterPostedOnTo.value = postedOnTo;
-
-    handleFilterChange();
-  }
-
-  async function handleFilterChange() {
-    try {
-      let url = 'http://localhost:3000/api/transactions';
-
-      if (filters.value.size > 0) {
-        url += '?';
-
-        for (const [key, value] of filters.value.entries()) {
-          url += `${key}=${value}&`;
-        }
-
-        url.substring(0, url.length - 1);
-      }
-
-      console.log(url);
-
-      const response = await fetch(url);
-
-      const transactionsList = (await response.json()) as TransactionsListResponse;
-
-      transactions.value = transactionsList.data;
-    } catch (error: unknown) {
-      console.log('Error filtering', error);
-    }
-  }
-
-  function handleClearFilters() {
-    filters.value.clear();
-
-    filterCategory.value = '';
-    filterVendor.value = '';
-    filterTransactionOnFrom.value = '';
-    filterTransactionOnTo.value = '';
-    filterPostedOnFrom.value = '';
-    filterPostedOnTo.value = '';
-
-    handleFilterChange();
-  }
-
   return (
     <div class="max-w-7xl mx-auto mt-10">
       <div class="max-w-md mx-auto">
@@ -269,75 +115,7 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
         />
       </div>
 
-      <div class="max-w-7xl mx-auto mt-6">
-        <TransactionsFiltersForm
-          categories={categories}
-          vendors={vendors}
-          filterCategory={filterCategory}
-          filterVendor={filterVendor}
-          filterTransactionOnFrom={filterTransactionOnFrom}
-          filterTransactionOnTo={filterTransactionOnTo}
-          filterPostedOnFrom={filterPostedOnFrom}
-          filterPostedOnTo={filterPostedOnTo}
-          handleFilterCategoryChange={handleFilterCategoryChange}
-          handleFilterVendorChange={handleFilterVendorChange}
-          handleFilterTransactionOnFromChange={handleFilterTransactionOnFromChange}
-          handleFilterTransactionOnToChange={handleFilterTransactionOnToChange}
-          handleFilterPostedOnFromChange={handleFilterPostedOnFromChange}
-          handleFilterPostedOnToChange={handleFilterPostedOnToChange}
-          handleClearFilters={handleClearFilters}
-        />
-      </div>
-
-      <div class="overflow-x-auto mx-auto my-8 shadow-md">
-        <table class="min-w-full bg-white shadow-md rounded border-collapse">
-          <thead>
-            <tr>
-              <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Actions</th>
-              <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Transaction On</th>
-              <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Posted On</th>
-              <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Amount</th>
-              <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Type</th>
-              <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Category</th>
-              <th class="py-2 px-4 border text-gray-600 font-bold uppercase text-sm text-left">Vendor</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.value.map((transaction) => (
-              <tr key={transaction.id}>
-                <td class="py-2 px-4 border">
-                  <button
-                    class="mr-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                    onClick={() => handleDelete(transaction.id)}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline"
-                    onClick={() => {}}
-                  >
-                    Tag
-                  </button>
-                </td>
-                <td class="py-2 px-4 border">{dayjs.utc(transaction.transaction_on).format('MM/DD/YYYY')}</td>
-                <td class="py-2 px-4 border">{dayjs.utc(transaction.posted_on).format('MM/DD/YYYY')}</td>
-                <td class={`py-2 px-4 border ${transaction.transaction_type === 'debit' ? 'text-red-500' : ''}`}>
-                  {transaction.transaction_type === 'debit'
-                    ? `(${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-                        transaction.amount / 100,
-                      )})`
-                    : new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(
-                        transaction.amount / 100,
-                      )}
-                </td>
-                <td class="py-2 px-4 border">{capitalize(transaction.transaction_type)}</td>
-                <td class="py-2 px-4 border">{transaction.category.name}</td>
-                <td class="py-2 px-4 border">{transaction.vendor.name}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <TransactionsSection />
     </div>
   );
 };
