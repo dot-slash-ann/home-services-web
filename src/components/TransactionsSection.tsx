@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import { useSignal } from '@preact/signals';
+import { Signal, useSignal } from '@preact/signals';
 import { FunctionalComponent, h } from 'preact';
 import { useEffect } from 'preact/hooks';
 
@@ -15,7 +15,17 @@ import TransactionsTable from '../components/tables/transactions-table';
 
 dayjs.extend(utc);
 
-const TransactionsSection: FunctionalComponent = (): h.JSX.Element => {
+type TransactionsSectionProps = {
+  categories: Signal<Category[]>;
+  transactions: Signal<Transaction[]>;
+  vendors: Signal<Vendor[]>;
+};
+
+const TransactionsSection: FunctionalComponent<TransactionsSectionProps> = ({
+  categories,
+  transactions,
+  vendors,
+}: TransactionsSectionProps): h.JSX.Element => {
   const filterCategory = useSignal<string>('');
   const filterVendor = useSignal<string>('');
   const filterTransactionOnFrom = useSignal<string>('');
@@ -24,37 +34,6 @@ const TransactionsSection: FunctionalComponent = (): h.JSX.Element => {
   const filterPostedOnTo = useSignal<string>('');
 
   const filters = useSignal<Map<`${FiltersType}_id` | DateFilterType, number | string>>(new Map());
-
-  const transactions = useSignal<Transaction[]>([]);
-  const categories = useSignal<Category[]>([]);
-  const vendors = useSignal<Vendor[]>([]);
-
-  useEffect(() => {
-    async function fetchTransactions() {
-      const response = await fetch('http://localhost:3000/api/transactions');
-      const transactionsResponse = (await response.json()) as TransactionsListResponse;
-
-      transactions.value = transactionsResponse.data;
-    }
-
-    async function fetchCategories() {
-      const response = await fetch('http://localhost:3000/api/categories');
-      const categoriesResponse = (await response.json()) as CategoriesListResponse;
-
-      categories.value = categoriesResponse.data;
-    }
-
-    async function fetchVendors() {
-      const response = await fetch('http://localhost:3000/api/vendors');
-      const vendorsResponse = (await response.json()) as VendorsListResponse;
-
-      vendors.value = vendorsResponse.data;
-    }
-
-    fetchTransactions();
-    fetchCategories();
-    fetchVendors();
-  }, []);
 
   async function handleDelete(id: number): Promise<void> {
     try {

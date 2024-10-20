@@ -5,11 +5,18 @@ import { useEffect } from 'react';
 
 import TransactionsSection from '../components/TransactionsSection';
 import { Budget, BudgetCategory, BudgetDetailsResponse } from '../types/budgets';
+import { Transaction, TransactionsListResponse } from '../types/transactions';
+import { CategoriesListResponse, Category } from '../types/categories';
+import { Vendor, VendorsListResponse } from '../types/vendors';
 
 const BudgetDetailsPage: FunctionComponent = (): h.JSX.Element => {
   const { id } = useParams<{ id: string }>();
   const budget = useSignal<Budget>();
   const budgetCategories = useSignal<BudgetCategory[]>([]);
+
+  const transactions = useSignal<Transaction[]>([]);
+  const categories = useSignal<Category[]>([]);
+  const vendors = useSignal<Vendor[]>([]);
 
   useEffect(() => {
     async function fetchBudget() {
@@ -20,6 +27,30 @@ const BudgetDetailsPage: FunctionComponent = (): h.JSX.Element => {
       budgetCategories.value = budgetResponse.data.categories;
     }
 
+    async function fetchTransactions() {
+      const response = await fetch('http://localhost:3000/api/transactions');
+      const transactionsResponse = (await response.json()) as TransactionsListResponse;
+
+      transactions.value = transactionsResponse.data;
+    }
+
+    async function fetchCategories() {
+      const response = await fetch('http://localhost:3000/api/categories');
+      const categoriesResponse = (await response.json()) as CategoriesListResponse;
+
+      categories.value = categoriesResponse.data;
+    }
+
+    async function fetchVendors() {
+      const response = await fetch('http://localhost:3000/api/vendors');
+      const vendorsResponse = (await response.json()) as VendorsListResponse;
+
+      vendors.value = vendorsResponse.data;
+    }
+
+    fetchTransactions();
+    fetchCategories();
+    fetchVendors();
     fetchBudget();
   }, [id]);
 
@@ -37,11 +68,24 @@ const BudgetDetailsPage: FunctionComponent = (): h.JSX.Element => {
               }).format(budgetCategory.amount / 100)}
             </div>
             <div class="text-sm text-gray-600">{budgetCategory.category.name}</div>
+            <div class="text-sm text-gray-600">
+              {new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+              }).format(
+                transactions.value
+                  .filter((transaction) => transaction.category.name === budgetCategory.category.name)
+                  .map((transaction) => transaction.amount)
+                  .reduce((sum, amount) => {
+                    return (sum += amount);
+                  }, 0) / 100,
+              )}
+            </div>
           </div>
         ))}
       </div>
 
-      <TransactionsSection />
+      <TransactionsSection categories={categories} transactions={transactions} vendors={vendors} />
     </div>
   );
 };

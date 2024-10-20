@@ -115,7 +115,7 @@ const TransactionsPage: FunctionalComponent = (): h.JSX.Element => {
         />
       </div>
 
-      <TransactionsSection />
+      <TransactionsSection categories={categories} transactions={transactions} vendors={vendors} />
     </div>
   );
 };
