@@ -59,30 +59,39 @@ const BudgetDetailsPage: FunctionComponent = (): h.JSX.Element => {
       <h1 class="text-2xl font-bold">{budget.value?.name}</h1>
       <div class="mt-4">
         <h2 class="text-xl font-semibold">Categories</h2>
-        {budgetCategories.value.map((budgetCategory) => (
-          <div key={budgetCategory.category.id} class="mt-2 p-4 bg-gray-100 rounded shadow-sm">
-            <div class="text-lg">
-              {new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-              }).format(budgetCategory.amount / 100)}
-            </div>
-            <div class="text-sm text-gray-600">{budgetCategory.category.name}</div>
-            <div class="text-sm text-gray-600">
-              {new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-              }).format(
-                transactions.value
-                  .filter((transaction) => transaction.category.name === budgetCategory.category.name)
-                  .map((transaction) => transaction.amount)
-                  .reduce((sum, amount) => {
-                    return (sum += amount);
-                  }, 0) / 100,
-              )}
-            </div>
-          </div>
-        ))}
+        <div class="flex">
+          {budgetCategories.value.map((budgetCategory) => {
+            const totalSpent = transactions.value
+              .filter((transaction) => transaction.category.name === budgetCategory.category.name)
+              .map((transaction) => transaction.amount)
+              .reduce((sum, amount) => (sum += amount), 0);
+
+            const ratio = totalSpent / budgetCategory.amount;
+
+            return (
+              <div key={budgetCategory.category.id} class="mt-2 p-4 max-w-sm bg-gray-100 min-w-52 rounded shadow-sm">
+                <div class="flex">
+                  <div
+                    class={`text-lg ${ratio < 0.45 ? 'text-green-500' : ratio < 0.8 ? 'text-yellow-500' : 'text-red-500'}`}
+                  >
+                    {new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                    }).format(totalSpent / 100)}{' '}
+                  </div>
+                  <span> / </span>
+                  <div class="self-center">
+                    {new Intl.NumberFormat('en-US', {
+                      style: 'currency',
+                      currency: 'USD',
+                    }).format(budgetCategory.amount / 100)}
+                  </div>
+                </div>
+                <div class="text-sm text-gray-600">{budgetCategory.category.name}</div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <TransactionsSection categories={categories} transactions={transactions} vendors={vendors} />
